@@ -22,13 +22,13 @@ void AddonRender();
 void AddonOptions();
 
 /* globals */
-AddonDefinition AddonDef	= {};
-HMODULE hSelf				= nullptr;
-AddonAPI* APIDefs			= nullptr;
-NexusLinkData* NexusLink	= nullptr;
-Mumble::Data* MumbleLink	= nullptr;
+AddonDefinition AddonDef = {};
+HMODULE hSelf            = nullptr;
+AddonAPI* APIDefs        = nullptr;
+NexusLinkData* NexusLink = nullptr;
+Mumble::Data* MumbleLink = nullptr;
 
-bool someSetting			= false;
+bool someSetting         = false;
 
 ///----------------------------------------------------------------------------------------------------
 /// DllMain:
@@ -85,12 +85,12 @@ void AddonLoad(AddonAPI* aApi)
 	ImGui::SetCurrentContext((ImGuiContext*)APIDefs->ImguiContext); // cast to ImGuiContext*
 	ImGui::SetAllocatorFunctions((void* (*)(size_t, void*))APIDefs->ImguiMalloc, (void(*)(void*, void*))APIDefs->ImguiFree); // on imgui 1.80+
 
-	NexusLink = (NexusLinkData*)APIDefs->GetResource("DL_NEXUS_LINK");
-	MumbleLink = (Mumble::Data*)APIDefs->GetResource("DL_MUMBLE_LINK");
+	NexusLink = (NexusLinkData*)APIDefs->DataLink.Get("DL_NEXUS_LINK");
+	MumbleLink = (Mumble::Data*)APIDefs->DataLink.Get("DL_MUMBLE_LINK");
 
 	// Add an options window and a regular render callback
-	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
-	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
+	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
+	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
 
 	APIDefs->Log(ELogLevel_DEBUG, "My First addon", "My <c=#00ff00>first addon</c> was loaded.");
 }
@@ -102,8 +102,8 @@ void AddonLoad(AddonAPI* aApi)
 void AddonUnload()
 {
 	/* let's clean up after ourselves */
-	APIDefs->DeregisterRender(AddonRender);
-	APIDefs->DeregisterRender(AddonOptions);
+	APIDefs->Renderer.Deregister(AddonRender);
+	APIDefs->Renderer.Deregister(AddonOptions);
 
 	APIDefs->Log(ELogLevel_DEBUG, "My First addon", "<c=#ff0000>Signing off</c>, it was an honor commander.");
 }
